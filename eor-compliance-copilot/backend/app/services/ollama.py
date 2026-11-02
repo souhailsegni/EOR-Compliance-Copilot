@@ -1,3 +1,4 @@
+
 import httpx
 
 from app.core.config import settings
@@ -40,6 +41,41 @@ class OllamaService:
                 "model_available": False,
                 "error": str(exc),
             }
+
+    async def generate_response(
+        self,
+        prompt: str,
+        system_prompt: str | None = None,
+    ) -> str:
+
+        url = f"{self.base_url}/api/chat"
+
+        messages = []
+
+        if system_prompt:
+            messages.append({
+                "role": "system",
+                "content": system_prompt,
+            })
+
+        messages.append({
+            "role": "user",
+            "content": prompt,
+        })
+
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "stream": False,
+        }
+
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            response = await client.post(url, json=payload)
+            response.raise_for_status()
+
+            data = response.json()
+
+            return data["message"]["content"]
 
 
 ollama_service = OllamaService()
