@@ -1,6 +1,5 @@
 
 import chromadb
-
 from pathlib import Path
 
 
@@ -21,26 +20,18 @@ class VectorStore:
         if not chunks:
             return
 
-        ids = []
-        documents = []
-        metadatas = []
-        embeddings = []
-
-        for chunk in chunks:
-            ids.append(chunk["id"])
-            documents.append(chunk["text"])
-            metadatas.append({
-                "source": chunk["source"],
-                "page": chunk["page"],
-                "document_id": chunk["document_id"],
-            })
-            embeddings.append(chunk["embedding"])
-
         self.collection.upsert(
-            ids=ids,
-            documents=documents,
-            metadatas=metadatas,
-            embeddings=embeddings,
+            ids=[chunk["id"] for chunk in chunks],
+            documents=[chunk["text"] for chunk in chunks],
+            metadatas=[
+                {
+                    "source": chunk["source"],
+                    "page": chunk["page"],
+                    "document_id": chunk["document_id"],
+                }
+                for chunk in chunks
+            ],
+            embeddings=[chunk["embedding"] for chunk in chunks],
         )
 
     def search(
@@ -48,9 +39,12 @@ class VectorStore:
         query_embedding: list[float],
         top_k: int = 5,
     ) -> dict:
+        if self.collection.count() == 0:
+            return {"ids": [[]], "documents": [[]], "metadatas": [[]], "distances": [[]]}
+
         return self.collection.query(
             query_embeddings=[query_embedding],
-            n_results=top_k,
+            n_results=min(top_k, self.collection.count()),
         )
 
 
