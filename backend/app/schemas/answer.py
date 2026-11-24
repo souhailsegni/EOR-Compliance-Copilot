@@ -11,6 +11,11 @@ class EvidenceItem(BaseModel):
     section: str | None = None
 
 
+class EvidenceAssessment(BaseModel):
+    sufficiency: Literal["full", "partial", "none"]
+    reason: str
+
+
 class AnswerResponse(BaseModel):
     answer: str
 
@@ -19,11 +24,9 @@ class AnswerResponse(BaseModel):
     )
 
     confidence: Literal["high", "medium", "low"]
-
     confidence_reason: str
 
     escalation_required: bool
-
     escalation_reason: str | None = None
 
     follow_up_questions: list[str] = Field(

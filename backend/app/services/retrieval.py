@@ -4,7 +4,7 @@ from app.database.vector_store import vector_store
 
 
 class RetrievalService:
-    def __init__(self, max_distance: float = 0.42):
+    def __init__(self, max_distance: float = 0.50):
         self.max_distance = max_distance
 
     async def retrieve(
