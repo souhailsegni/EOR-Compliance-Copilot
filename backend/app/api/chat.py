@@ -2,7 +2,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from app.services.ollama import ollama_service
+from app.schemas.answer import AnswerResponse
+from app.services.answer_generation import answer_generation_service
 
 
 router = APIRouter(
@@ -15,33 +16,18 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=5000)
 
 
-class ChatResponse(BaseModel):
-    question: str
-    answer: str
-    model: str
-
-
-@router.post("/", response_model=ChatResponse)
-async def chat(request: ChatRequest):
+@router.post("/", response_model=AnswerResponse)
+async def chat(request: ChatRequest) -> AnswerResponse:
 
     try:
-        answer = await ollama_service.generate_response(
-            prompt=request.message,
-            system_prompt=(
-                "You are an AI assistant. "
-                "Answer clearly and accurately. "
-                "If you do not know something, say so."
-            ),
+        result = await answer_generation_service.generate_answer(
+            question=request.message
         )
 
-        return ChatResponse(
-            question=request.message,
-            answer=answer,
-            model=ollama_service.model,
-        )
+        return result
 
     except Exception as exc:
         raise HTTPException(
             status_code=502,
-            detail=f"LLM service error: {str(exc)}",
-        )
+            detail="Answer generation service error.",
+        ) from exc

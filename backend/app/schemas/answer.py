@@ -14,6 +14,7 @@ class EvidenceItem(BaseModel):
 class EvidenceAssessment(BaseModel):
     sufficiency: Literal["full", "partial", "none"]
     reason: str
+    relevant_evidence_indices: list[int] = Field(default_factory=list)
 
 
 class AnswerResponse(BaseModel):
