@@ -1,6 +1,7 @@
-
 import asyncio
-from app.services.retrieval import retrieval_service
+
+from app.services.embedding import embedding_service
+from app.database.vector_store import vector_store
 
 
 QUESTIONS = [
@@ -12,21 +13,25 @@ QUESTIONS = [
 
 async def main():
     for question in QUESTIONS:
-        results = await retrieval_service.retrieve(
-            question=question,
+        query_embedding = await embedding_service.generate_embedding(question)
+
+        results = vector_store.search(
+            query_embedding=query_embedding,
             top_k=3,
         )
 
         print("\n" + "=" * 70)
         print(f"QUESTION: {question}")
-        print(f"RETRIEVED CHUNKS: {len(results)}")
 
-        for index, item in enumerate(results, start=1):
-            print(f"\nResult {index}")
-            print(f"Source: {item['source']}")
-            print(f"Page: {item['page']}")
-            print(f"Distance: {item['distance']:.4f}")
-            print(f"Text: {item['text'][:250]}...")
+        for index, document in enumerate(results["documents"][0]):
+            metadata = results["metadatas"][0][index]
+            distance = results["distances"][0][index]
+
+            print(
+                f"\nPage: {metadata['page']} | "
+                f"Distance: {distance:.4f}"
+            )
+            print(f"Text: {document[:180]}...")
 
 
 if __name__ == "__main__":
