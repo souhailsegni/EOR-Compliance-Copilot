@@ -226,6 +226,7 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ### 5. Check the API
 
 -   API root: http://localhost:8000/
+-   Demo UI: http://localhost:8000/demo/
 -   Health: http://localhost:8000/health
 -   LLM health: http://localhost:8000/health/llm
 -   Swagger UI: http://localhost:8000/docs
