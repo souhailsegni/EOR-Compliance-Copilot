@@ -7,7 +7,7 @@ from app.services.answer_generation import answer_generation_service
 
 
 router = APIRouter(
-    prefix="/api/v1/chat",
+    prefix="/chat",
     tags=["Chat"],
 )
 
