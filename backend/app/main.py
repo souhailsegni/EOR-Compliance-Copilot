@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.api.health import router as health_router
@@ -11,12 +10,6 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="AI-powered EOR Compliance Assistant",
-)
-
-app.mount(
-    "/demo",
-    StaticFiles(directory="app/static", html=True),
-    name="demo",
 )
 
 app.include_router(documents_router, prefix=settings.API_V1_PREFIX)
